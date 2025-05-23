@@ -1,0 +1,154 @@
+openapi: 3.0.0
+info:
+  title: Simple Translator API
+  version: 1.0.0
+  description: API для перекладу слів та визначення частин мови
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+
+paths:
+  /api/translate:
+    get:
+      summary: Переклад слова
+      description: Отримати переклад англійського слова
+      tags:
+        - Translation
+      parameters:
+        - name: word
+          in: query
+          required: true
+          description: Слово для перекладу
+          schema:
+            type: string
+            example: "hello"
+      responses:
+        '200':
+          description: Успішний переклад
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  word:
+                    type: string
+                    example: "hello"
+                  translation:
+                    type: string
+                    example: "a greeting or expression of goodwill"
+                  phonetic:
+                    type: string
+                    example: "/həˈloʊ/"
+                  success:
+                    type: boolean
+                    example: true
+        '400':
+          description: Помилка - відсутній параметр
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Слово не знайдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/partofspeech:
+    get:
+      summary: Частина мови
+      description: Визначити частину мови слова
+      tags:
+        - Grammar
+      parameters:
+        - name: word
+          in: query
+          required: true
+          description: Слово для аналізу
+          schema:
+            type: string
+            example: "hello"
+      responses:
+        '200':
+          description: Успішне визначення частини мови
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  word:
+                    type: string
+                    example: "hello"
+                  partOfSpeech:
+                    type: string
+                    example: "interjection"
+                  partOfSpeechUa:
+                    type: string
+                    example: "вигук"
+                  synonyms:
+                    type: array
+                    items:
+                      type: string
+                    example: ["hi", "hey", "greetings"]
+                  success:
+                    type: boolean
+                    example: true
+        '400':
+          description: Помилка - відсутній параметр
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Слово не знайдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/health:
+    get:
+      summary: Перевірка стану сервісу
+      description: Endpoint для моніторингу стану API
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Сервіс працює нормально
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  timestamp:
+                    type: string
+                    format: date-time
+                  service:
+                    type: string
+                    example: "Simple Translator API"
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Word not found"
+        message:
+          type: string
+          example: "Слово не знайдено в словнику"
+        word:
+          type: string
+          example: "unknownword"
